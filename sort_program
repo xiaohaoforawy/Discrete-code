@@ -82,20 +82,24 @@ void QuickSort(int arraynum[],int n)//快速排序
 
 void Merge(int source[],int temp[],int start,int mid,int endi)
 {
-    int i=start,j=mid,k=start;
-    while(i!=mid+1&&j!=endi+1)
+    int i=start,j=mid+1,k=start;
+    while(i!=mid&&j!=endi)
     {
-        if(source[i]>source[j])
-            temp[k++]=source[j++];
-        else
+        if(source[i]<=source[j])
             temp[k++]=source[i++];
+        else
+            temp[k++]=source[j++];
     }
-    while(i!=mid+1)
+    if(i<=mid)
     {
-        temp[k++]=source[i++];
+        while(i<=mid)
+            temp[k++]=temp[i++];
     }
-    while(j!=mid+1)
-        temp[k++]=source[j++];
+    else
+    {
+        while(j<=endi)
+            temp[k++]=temp[j++];
+    }
     for(i=start;i<=endi;i++)
         source[i]=temp[i];
 }
@@ -116,12 +120,117 @@ void MergeSort(int arraynum[],int n)//归并排序
     mergesort(arraynum,b,0,n-1);
 }
 
+void heapadjust(int arraynum[],int i,int length)
+{
+    int nchild;
+    int ntemp;
+    for(;2*i+1<length;i=nchild)
+    {
+        nchild=2*i+1;
+        if(nchild<length-1&&arraynum[nchild+1]>arraynum[nchild])++nchild;
+        if(arraynum[i]<arraynum[nchild])
+        {
+            ntemp=arraynum[i];
+            arraynum[i]=arraynum[nchild];
+            arraynum[nchild]=ntemp;
+        }
+        else
+            break;
+    }
+}
+void HeapSort(int arraynum[],int n)//堆排序
+{
+    int i;
+    for(i=n/2-1;i>=0;--i)
+    {
+        heapadjust(arraynum,i,n);
+    }
+    for(i=n-1;i>0;--i)
+    {
+        arraynum[i]=arraynum[0]^arraynum[i];
+        arraynum[0]=arraynum[0]^arraynum[i];
+        arraynum[i]=arraynum[0]^arraynum[i];
+        heapadjust(arraynum,0,i);
+    }
+}
+
+int maxb(int arraynum[],int n)//基数排序求最大位
+{
+    int d=1;
+    int p=10;
+    for(int i=0;i<n;++i)
+    {
+        while(arraynum[i]>=p)
+        {
+            p*=10;
+            ++d;
+        }
+    }
+    return d;
+}
+
+void RadixSort(int arraynum[],int n)//基数排序
+{
+    int d=maxb(arraynum,n);
+    int *tmp=new int[n];
+    int *countnum=new int[10];
+    int i,j,k;
+    int radix=1;
+    for(i=1;i<=d;i++)
+    {
+        for(j=0;j<10;j++)
+            countnum[j]=0;
+        for(j=0;j<n;j++)
+        {
+            k=(arraynum[j]/radix)%10;
+            countnum[k]++;
+        }
+        for(j=1;j<10;j++)
+        {
+            countnum[j]=countnum[j-1]+countnum[j];
+        }
+        for(j=n-1;j>=0;j--)
+        {
+            k=(arraynum[j]/radix)%10;
+            tmp[countnum[k]-1]=arraynum[j];
+            countnum[k]--;
+        }
+        for(j=0;j<n;j++)
+            arraynum[j]=tmp[j];
+        radix=radix*10;
+    }
+    delete []tmp;
+    delete []countnum;
+}
+void CocktailSort(int arraynum[],int n)//搅拌排序
+{
+    for(int i=0;i<(n-1)/2+1;i++)
+    {
+        if(i%2==0)
+        {
+            for(int j=n-1;j>i;j--)
+            {
+                if(arraynum[j]<arraynum[j-1])
+                    swap_array(arraynum,j,j-1);
+            }
+        }
+        else
+        {
+            for(int j=i;j<n-1;j++)
+            {
+                if(arraynum[j]>arraynum[j+1])
+                    swap_array(arraynum,j,j+1);
+            }
+        }
+    }
+}
+
 
 int main()
 {
-    int arraynum[9]={2,34,12,98,6,45,29,38,23};
-    MergeSort(arraynum,9);
-    for(int i=0;i<9;i++)
+    int arraynum[10]={2,34,12,98,6,23,45,299,38,23};
+    MergeSort(arraynum,10);
+    for(int i=0;i<10;i++)
         cout<<arraynum[i]<<" ";
     cout<<endl;
     return 0;
