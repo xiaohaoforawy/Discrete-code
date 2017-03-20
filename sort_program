@@ -1,6 +1,6 @@
 //第一次写排序算法
 #include <iostream>
-
+#include<cstdio>
 using namespace std;
 
 void swap_array(int arraynum[],int i,int j)//交换函数
@@ -83,7 +83,7 @@ void QuickSort(int arraynum[],int n)//快速排序
 void Merge(int source[],int temp[],int start,int mid,int endi)
 {
     int i=start,j=mid+1,k=start;
-    while(i!=mid&&j!=endi)
+    while(i!=mid+1&&j!=endi+1)
     {
         if(source[i]<=source[j])
             temp[k++]=source[i++];
@@ -93,12 +93,12 @@ void Merge(int source[],int temp[],int start,int mid,int endi)
     if(i<=mid)
     {
         while(i<=mid)
-            temp[k++]=temp[i++];
+            temp[k++]=source[i++];
     }
     else
     {
         while(j<=endi)
-            temp[k++]=temp[j++];
+            temp[k++]=source[j++];
     }
     for(i=start;i<=endi;i++)
         source[i]=temp[i];
@@ -112,11 +112,12 @@ void mergesort(int arraynum[],int temp[],int start,int endin)
          mergesort(arraynum,temp,start,mid);
          mergesort(arraynum,temp,mid+1,endin);
          Merge(arraynum,temp,start,mid,endin);
+
      }
 }
 void MergeSort(int arraynum[],int n)//归并排序
 {
-    int b[n];
+    int b[100];
     mergesort(arraynum,b,0,n-1);
 }
 
