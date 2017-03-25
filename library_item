@@ -1,0 +1,411 @@
+//this is a my first super homework
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <iomanip>
+#include <sstream>
+#include <windows.h>
+#include <string.h>
+
+#define bookshelfsize 50
+#define libclientnum 10
+
+using namespace std;
+
+int book_system_time;           //全局变量，时间，世界通用
+
+int stringtoint(string s)//基本函数
+{
+    int num;
+    stringstream ss(s);
+    ss>>num;
+    return num;
+}
+
+string inttostring(int i)
+{
+    stringstream ss;
+    ss<<i;
+    return ss.str();
+}
+
+typedef struct book_singal{                  //书结构,全部是静态信息
+
+    string type;                             //书的类型
+    int buytime;                             //书的购买时间，也就是书被录入图书馆的时间
+    string name;                             //书名
+    string author;                           //书的作者
+    string press;                            //出版社
+    double price;                            //书价格
+    int borrowpermission;                    //书的借阅权限，1代表老师和学生均可以借阅，0代表只有老师可以借阅
+    int state;                               //书的状态，1代表该书还在图书馆中，0代表该书已被借阅,2代表已经删除
+    string id;                               //书的编号，由code()函数生成
+    void introduction()                      //书的简介，生成不用输入
+    {
+        cout<<"this book has a name of "<<book_singal.name
+        <<",wroten by "<<book_singal.author
+        <<",type is "<<book_singal.type
+        <<",press is "<<book_singal.press<<endl;
+    };
+}sinbook;
+
+class book_shelf
+{
+public:
+    sinbook booklib[bookshelfsize];          //书的总数量
+    void buybook();                          //图书入库
+    void initializebook();                   //从文件初始化图书
+    void renewbook(string renewid,int renew_choice);                        //更新修改信息
+    void borrowbook();                       //借书模块
+    void search_book_shelf(int num,string inf);         //查询模块
+};
+
+unsigned int RSHash(string mas)              //hash函数
+{
+    const char *str = mas.c_str();
+    unsigned int b = 378551;
+    unsigned int a = 63689;
+    unsigned int hash = 0;
+
+    while (*str)
+    {
+        hash = hash * a + (*str++);
+        a *= b;
+    }
+
+    return (hash  & 0x3FFF);
+}
+
+string code(sinbook bbkk)                    //最大允许有10本相同的书
+{
+    string exmname;
+    exmname=bbkk.name;
+    string exmpress;
+    exmprese=bbkk.press;
+    fstream fin("code_dictionary.txt");
+    int namecode;
+    while(!fin.eof())
+    {
+        string rubbish2;
+        getline(fin,string ename);
+        getline(fin,string epress);
+        getline(fin,string eauthor);
+        if(ename==exmname&&epress==exmpress&&eauthor==bbkk.author)
+        {
+            getline(fin,string enumber);
+            namecode=stringtoint(enumber)-(stringtoint(enumber)/10)*10+1;
+            getline(fin,rubbish2);
+        }
+        else
+            getline(fin,rubbish2);
+    }
+    fin.close();
+    bbkk.id=inttostring(RSHash(exmname))+inttostring(RSHash(exmpress))+inttostring(namecode);
+    ofstream fout("code_dictionary.txt",ios::out|ios::app);
+    fout<<bbkk.name<<endl;
+    fout<<bbkk.press<<endl;
+    fout<<bbkk.author<<endl;
+    fout<<bbkk.id<<endl;
+    fout.close();
+    return bbkk.id;
+}
+
+void book_shelf::buybook()                   //买书会存书
+{
+    sinbook temp_book;
+    cout<<"Please input book type:";
+    cin>>temp_book.type;
+    cout<<"\nplease input name:";
+    cin>>temp_book.name;
+    cout<<"\nplease input author:";
+    cin>>temp_book.author;
+    cout<<"\nplease input press:";
+    cin>>temp_book.press;
+    cout<<"\nplease input price:";
+    cin>>temp_book.price;
+    cout<<"\nplease input borrowpermission:";
+    cin>>temp_book.borrowpermission;
+    temp_book.id=code(temp_book);
+    temp_book.buytime=book_system_time;
+    
+    booklib[the_last]=temp_book;
+    ofstream fout("buy_information.txt",ios::out|ios::app);//买书记录
+        fout<<temp_book.type<<endl;
+        fout<<temp_book.buytime<<endl;
+        fout<<temp_book.name<<endl;
+        fout<<temp_book.author<<endl;
+        fout<<temp_book.press<<endl;
+        fout<<temp_book.price<<endl;
+        fout<<temp_book.borrowpermission<<endl;
+        fout<<temp_book.state<<endl;
+        fout<<temp_book.id<<endl;
+    fout.close();
+}
+
+void book_shelf::search_book_shelf(int num,string inf)//这里有问题，问题取决于图书的存储格式
+{
+    switch (num)
+    {
+    case 1:           //查询作者
+        {
+            for(int i=0;booklib[i];i++)
+            {
+                if(booklib[i].type==inf)
+                {
+                    throw booklib[i].id;
+                }
+            }
+        }
+    case 2:
+        {
+            for(int i=0;booklib[i];i++)
+            {
+                if(booklib[i].buytime==inf)
+                {
+                    throw booklib[i].id;
+                }
+            }
+        }
+    case 3：
+        {
+             for(int i=0;booklib[i];i++)
+            {
+                if(booklib[i].buytime==inf)
+                {
+                    throw booklib[i].id;
+                }
+            }
+        }
+    }
+    //可以构建查询记录，构建热搜榜，文件
+}
+
+void renewbook(string renewid,int renew_choice)               //更新图书信息
+{
+    int searbookinf=0;
+    for(int i=0;booklib[i]&&searbookinf==0;i++)
+    {
+        if(booklib[i]==renewid)
+            searbookinf=i;
+    }
+    switch (renew_choice)
+    {
+    case 1:
+        {
+            cout<<"Please input book type:";
+            cin>>booklib[searbookinf].type;
+        }
+    case 2:
+        {
+            cout<<"Please input book name:";
+            cin>>booklib[searbookinf].name;
+        }
+    case 3:
+        {
+            cout<<"Please input book author:";
+            cin>>booklib[searbookinf].author;
+        }
+    case 4:
+        {
+            cout<<"Please input book press:";
+            cin>>booklib[searbookinf].press;
+        }
+    case 5:
+        {
+            cout<<"Please input book price:";
+            cin>>booklib[searbookinf].price;
+        }
+
+    case 6:
+        {
+            cout<<"Please input book borrowpermession:";
+            cin>>booklib[searbookinf].borrowpermession;
+        }
+    }
+}
+
+typedef struct lib_client{                         //人员结构
+    string name;                            //客户姓名
+    int client_identity;                    //身份信息用来区分老师和学生，0代表老师，1代表学生,2代表管理员
+    string institute;                       //客户所在学院
+    int creat_time;                          //账户创建时间
+    int borrownum;                          //客户已借阅图书数量
+    string borrowid[5];                     //客户已借图书的id
+    int orderbooknum;
+    string orderbookid[5];                   //预约的图书ID
+    double Arrears_money;                     //借书欠款
+    int honestlevel;                         //诚信等级
+    string clid;                              //id
+}boclient;
+
+class client_tab
+{
+public:
+    boclient suclient[libclientnum];          //存人员信息
+    void new_client();                        //加入人员
+    void initializebook();                    //初始化
+    void renewclient();                       //更新人员信息
+    void search_client_inf(int num,string inf);         //查询模块
+};
+string codclient()
+{
+     string exmname;
+    exmname=bbkk.name;
+    string exmpress;
+    exmprese=bbkk.press;
+    fstream fin("code_dictionary.txt");
+    int namecode;
+    while(!fin.eof())
+    {
+        string rubbish2;
+        getline(fin,string ename);
+        getline(fin,string epress);
+        getline(fin,string eauthor);
+        if(ename==exmname&&epress==exmpress&&eauthor==bbkk.author)
+        {
+            getline(fin,string enumber);
+            namecode=stringtoint(enumber)-(stringtoint(enumber)/10)*10+1;
+            getline(fin,rubbish2);
+        }
+        else
+            getline(fin,rubbish2);
+    }
+    fin.close();
+    bbkk.id=inttostring(RSHash(exmname))+inttostring(RSHash(exmpress))+inttostring(namecode);
+    ofstream fout("code_dictionary.txt",ios::out|ios::app);
+    fout<<bbkk.name<<endl;
+    fout<<bbkk.press<<endl;
+    fout<<bbkk.author<<endl;
+    fout<<bbkk.id<<endl;
+    fout.close();
+    return bbkk.id;
+}
+void client_tab::new_client()
+{
+    boclient tempcli;
+    cout<<"please input the client name:";
+    cin>>tempcli.name;
+    cout<<"please input the client client_identity:";
+    cin>>tempcli.client_identity;
+    cout<<"please input the client institute:";
+    cin>>tempcli.institute;
+    tempcli.creat_time=book_system_time;
+    tempcli.borrownum=0;
+    tempcli.orderbooknum=0;
+    tempcli.clid=codclient();
+    
+    booklib[the_last]=temp_book;
+    ofstream fout("buy_information.txt",ios::out|ios::app);//买书记录
+        fout<<temp_book.type<<endl;
+        fout<<temp_book.buytime<<endl;
+        fout<<temp_book.name<<endl;
+        fout<<temp_book.author<<endl;
+        fout<<temp_book.press<<endl;
+        fout<<temp_book.price<<endl;
+        fout<<temp_book.borrowpermission<<endl;
+        fout<<temp_book.state<<endl;
+        fout<<temp_book.id<<endl;
+    fout.close();
+}
+void book_shelf::borrowbook()                 //借书模块
+{
+     
+}
+
+void book_shelf::initializebook()            //从文件初始化
+{
+    ifstream fin("book_she_text.txt");                         //读取图书基本信息
+    int i=0
+    string str;
+    while(!fin.eof())
+    {
+        getline(fin,booklib[i].type);
+        fin>>booklib[i].buytime;
+        getline(fin,str);
+        getline(fin,booklib[i].name);
+        getline(fin,booklib[i].author);
+        getline(fin,booklib[i].press);
+        fin>>booklib[i].price;
+        getline(fin,str);
+        fin>>booklib[i].borrowpermission;
+        getline(fin,str);
+        fin>>booklib[i].state;
+        getline(fin,str);
+        getline(fin,booklib[i].id);
+        ++i;
+    }
+    fin.close();
+}
+
+typedef struct __THREAD_DATA
+{
+    int localtime;
+}THREAD_DATA;
+
+HANDLE g_hMutex = NULL;
+
+DWORD WINAPI ThreadProc(LPVOID lpParameter)
+{
+    THREAD_DATA* pThreadData = (THREAD_DATA*)lpParameter;
+
+    while(true)
+    {
+        WaitForSingleObject(g_hMutex, INFINITE);
+        pThreadData->localtime++;
+        Sleep(1000);
+        ReleaseMutex(g_hMutex);
+    }
+    return 0L;
+}
+
+void lib_preserv_end()                         //结束保存信息函数
+{
+    ofstream fout("time_single.txt");//对时间的保存
+    fout<<book_system_time;
+    fout.close();
+    
+    ofstream fout("book_she_text.txt");
+    for(int i=1;book_shelf::booklibb[i];++i)
+    {
+        fout<<book_shelf::booklib[i].type<<endl;
+        fout<<book_shelf::booklib[i].buytime<<endl;
+        fout<<book_shelf::booklib[i].name<<endl;
+        fout<<book_shelf::booklib[i].author<<endl;
+        fout<<book_shelf::booklib[i].press<<endl;
+        fout<<book_shelf::booklib[i].price<<endl;
+        fout<<book_shelf::booklib[i].borrowpermission<<endl;
+        fout<<book_shelf::booklib[i].state<<endl;
+        fout<<book_shelf::booklib[i].id<<endl;
+    }
+    fout.close();
+
+}
+
+
+
+int main()
+{
+    g_hMutex = CreateMutex(NULL, FALSE, NULL);
+    THREAD_DATA threadData;
+    fstream fin("time_single.txt");
+    string book_system_time1;
+    getline(fin,book_system_time1);
+    stringstream ss(book_system_time1);
+    ss>>book_system_time;
+    fin.close();
+    threadData.localtime=book_system_time;
+
+    HANDLE hThread1 = CreateThread(NULL, 0, ThreadProc, &threadData, 0, NULL);
+    CloseHandle(hThread1);
+    while(true)
+    {
+       WaitForSingleObject(g_hMutex, INFINITE);
+       if(true)
+       {
+           //main
+       }
+        ReleaseMutex(g_hMutex);
+    }
+    lib_preserv_end();
+    return 0;
+}
