@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int book_system_time;           //全局变量，时间，世界通用
+int book_system_time;              //虚拟时间
 int Cur_log_denti=0;               //全局变量，当前登陆区分，1表示管理员，0表示没有登陆，client登陆值是读者编号的int类型
 
 int stringtoint(string s)//基本函数
