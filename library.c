@@ -9,7 +9,7 @@
 
 using namespace std;
 
-int book_system_time;              //虚拟时间
+int book_system_time;           //全局变量，时间，世界通用
 int Cur_log_denti=0;               //全局变量，当前登陆区分，1表示管理员，0表示没有登陆，client登陆值是读者编号的int类型
 
 int stringtoint(string s)//基本函数
@@ -117,7 +117,54 @@ public:
     void display_client();                               //显示所有顾客
 };
 
-book_shelf::~book_shelf()
+int str_dist(const string source,const string target)
+{
+    //step 1
+
+    int n=source.length();
+    int m=target.length();
+    if (m==0) return n;
+    if (n==0) return m;
+    //Construct a matrix
+    typedef vector< vector<int> >  Tmatrix;
+    Tmatrix matrix(n+1);
+    for(int i=0; i<=n; i++)  matrix[i].resize(m+1);
+
+    //step 2 Initialize
+
+    for(int i=1;i<=n;i++) matrix[i][0]=i;
+    for(int i=1;i<=m;i++) matrix[0][i]=i;
+
+     //step 3
+     for(int i=1;i<=n;i++)
+     {
+        const char si=source[i-1];
+        //step 4
+        for(int j=1;j<=m;j++)
+        {
+
+            const char dj=target[j-1];
+            //step 5
+            int cost;
+            if(si==dj){
+                cost=0;
+            }
+            else{
+                cost=1;
+            }
+            //step 6
+            const int above=matrix[i-1][j]+1;
+            const int left=matrix[i][j-1]+1;
+            const int diag=matrix[i-1][j-1]+cost;
+            matrix[i][j]=min(above,min(left,diag));
+
+        }
+     }//step7
+      return matrix[n][m];
+}
+
+
+book_shelf::~book_shelf()                                                                     //析构函数
 {
     ofstream fout(".//document//time_single.txt");//对时间的保存
     fout<<book_system_time;
@@ -127,15 +174,26 @@ book_shelf::~book_shelf()
     ofstream dout(".//document//book_she_text.txt");//对书的保存
     for(int i=0; i<(int)booklib.size(); i++)
     {
+        dout<<"类型："<<endl;
         dout<<booklib[i].type<<endl;
-        dout<<booklib[i].name<<endl;
+        dout<<"购入时间："<<endl;
         dout<<booklib[i].buytime<<endl;
+        dout<<"书名："<<endl;
+        dout<<booklib[i].name<<endl;
+        dout<<"作者："<<endl;
         dout<<booklib[i].author<<endl;
+        dout<<"出版社："<<endl;
         dout<<booklib[i].press<<endl;
+        dout<<"价格："<<endl;
         dout<<booklib[i].price<<endl;
+        dout<<"借阅权限："<<endl;
         dout<<booklib[i].borrowpermission<<endl;
+        dout<<"状态："<<endl;
         dout<<booklib[i].state<<endl;
+        dout<<"ID："<<endl;
         dout<<booklib[i].id<<endl;
+        if(i!=booklib.size()-1)
+            dout<<endl;
     }
     dout.clear();
     dout.close();
@@ -143,22 +201,34 @@ book_shelf::~book_shelf()
     ofstream gout(".//document//client_he_text.txt");//对客户的保存
     for(int i=0; i<(int)suclient.size(); i++)
     {
+        gout<<"姓名："<<endl;
         gout<<suclient[i].name<<endl;
+        gout<<"密码："<<endl;
         gout<<suclient[i].cli_pass_word<<endl;
+        gout<<"身份："<<endl;
         gout<<suclient[i].client_identity<<endl;
+        gout<<"学院："<<endl;
         gout<<suclient[i].institute<<endl;
+        gout<<"账号创建时间："<<endl;
         gout<<suclient[i].creat_time<<endl;
-
+        gout<<"借书数量："<<endl;
         gout<<suclient[i].borrownum<<endl;
+        gout<<"借书ID："<<endl;
         for(int j=0; j<suclient[i].borrownum; j++)
             gout<<suclient[i].borrowid[j]<<endl;
-
+        gout<<"预约数量："<<endl;
         gout<<suclient[i].orderbooknum<<endl;
+        gout<<"预约ID："<<endl;
         for(int j=0; j<suclient[i].orderbooknum; j++)
             gout<<suclient[i].orderbookid[j]<<endl;
+        gout<<"欠款："<<endl;
         gout<<suclient[i].Arrears_money<<endl;
+        gout<<"诚信等级："<<endl;
         gout<<suclient[i].honestlevel<<endl;
+        gout<<"ID："<<endl;
         gout<<suclient[i].clid<<endl;
+        if(i!=suclient.size()-1)
+            gout<<endl;
     }
     gout.clear();
     gout.close();
@@ -167,52 +237,66 @@ book_shelf::~book_shelf()
 	ofstream rout(".//document//log_file.txt");//交易记录的保存
 	for (int i = 0;i<(int)bor_record.size();i++)
 	{
+	    rout<<"书ID："<<endl;
 		rout << bor_record[i].bor_book_id << endl;
+		rout<<"用户ID："<<endl;
 		rout << bor_record[i].bor_client_id << endl;
+		rout<<"借书/预约时间："<<endl;
 		rout << bor_record[i].bor_time << endl;
+		rout<<"借书时长/预约生效时间："<<endl;
 		rout << bor_record[i].bor_term << endl;
+		rout<<"借书/预约用户类型："<<endl;
 		rout << bor_record[i].bor_way << endl;
+		rout<<"罚款："<<endl;
 		rout << bor_record[i].bookfine << endl;
+		rout<<"状态："<<endl;
 		rout << bor_record[i].retu_book << endl;
+		rout<<"借书/预约："<<endl;
 		rout << bor_record[i].type_comm << endl;
+		if(i!=bor_record.size()-1)
+            rout<<endl;
 	}
 	rout.clear();
 	rout.close();
 	cout << "good night!" << endl;
 }
 
-book_shelf::book_shelf()
+book_shelf::book_shelf()                                                             //构造函数
 {
-
     fstream fin;
     fin.open(".//document//book_she_text.txt",fstream::in);                         //读取图书基本信息
     string str;
+
     sinbook temmem;
-    fin.seekg(0,ios_base::end);
-    int twmp=fin.tellg();
-    if(twmp!=0){
-        fin.seekg(0,ios_base::beg);
     while(!fin.eof())
     {
-
-        getline(fin,temmem.type);
-        fin>>temmem.buytime;
         getline(fin,str);
-        getline(fin,temmem.name);
-        getline(fin,temmem.author);
-        getline(fin,temmem.press);
-        fin>>temmem.price;
+        getline(fin,temmem.type);   //读取图书类型
         getline(fin,str);
-        fin>>temmem.borrowpermission;
+        fin>>temmem.buytime;         //读取图书购买时间
         getline(fin,str);
-        fin>>temmem.state;
         getline(fin,str);
-
-        getline(fin,temmem.id);
+        getline(fin,temmem.name);   //读取书名
+        getline(fin,str);
+        getline(fin,temmem.author);  //读取书的作者信息
+        getline(fin,str);
+        getline(fin,temmem.press);   //读取图书出版社
+        getline(fin,str);
+        fin>>temmem.price;           //读取图书价格
+        getline(fin,str);
+        getline(fin,str);
+        fin>>temmem.borrowpermission; //读取图书借阅权限
+        getline(fin,str);
+        getline(fin,str);
+        fin>>temmem.state;           //读取图书借阅状态
+        getline(fin,str);
+        getline(fin,str);
+        getline(fin,temmem.id);      //读取图书ID
+        getline(fin,str);
 
         booklib.push_back(temmem);//memory the information of temp book
     }
-    }
+
     fin.clear();
     fin.close();
 
@@ -226,44 +310,53 @@ book_shelf::book_shelf()
 
         while(!dfin.eof())
         {
-            getline(dfin,temclie.name);
-            getline(dfin,temclie.cli_pass_word);
-            dfin>>temclie.client_identity;
+            getline(dfin,str);
+            getline(dfin,temclie.name);     //读取客户姓名
+            getline(dfin,str);
+            getline(dfin,temclie.cli_pass_word);//读取客户密码
+            getline(dfin,str);
+            dfin>>temclie.client_identity;      //读取身份信息
 
             getline(dfin,str);
-
-            getline(dfin,temclie.institute);
-            dfin>>temclie.creat_time;
             getline(dfin,str);
-            dfin>>temclie.borrownum;
+
+            getline(dfin,temclie.institute);    //读取所在学院
+            getline(dfin,str);
+            dfin>>temclie.creat_time;           //读取账号创建时间
+            getline(dfin,str);
+            getline(dfin,str);
+            dfin>>temclie.borrownum;            //读取借书数量
+            getline(dfin,str);
             getline(dfin,str);
             if(temclie.borrownum>5||temclie.borrownum<-1)
                 temclie.borrownum=0;
-            for(int j=0; j<temclie.borrownum; j++)
-              {
-                 getline(dfin,temclie.borrowid[j]);
-                   cout<<"ttt";
-              }
-
-            dfin>>temclie.orderbooknum;
+            for(int j=0; j<temclie.borrownum; j++)  //读取借书ID
+            {
+                getline(dfin,temclie.borrowid[j]);
+            }
+            getline(dfin,str);
+            dfin>>temclie.orderbooknum;            //读取预约数量
+            getline(dfin,str);
             getline(dfin,str);
             if(temclie.orderbooknum>5||temclie.orderbooknum<-1)
                 temclie.orderbooknum=0;
-            for(int j=0; j<temclie.orderbooknum; j++)
+            for(int j=0; j<temclie.orderbooknum; j++) //读取预约ID
                getline(dfin,temclie.orderbookid[j]);
-            dfin>>temclie.Arrears_money;
             getline(dfin,str);
-            dfin>>temclie.honestlevel;
+            dfin>>temclie.Arrears_money;          //读取客户借书欠款
             getline(dfin,str);
-            getline(dfin,temclie.clid);
-
+            getline(dfin,str);
+            dfin>>temclie.honestlevel;            //读取诚信等级信息
+            getline(dfin,str);
+            getline(dfin,str);
+            getline(dfin,temclie.clid);           //读取客户ID
+            getline(dfin,str);
             suclient.push_back(temclie);
         }
 
     }
     dfin.clear();
     dfin.close();
-
     fstream gfin(".//document//log_file.txt");
     gfin.seekg(0,ios_base::end);
     int ewmp=gfin.tellg();
@@ -273,18 +366,27 @@ book_shelf::book_shelf()
 	borrow_mass temp_log;
 	while (!gfin.eof())
 	{
-		getline(gfin, temp_log.bor_book_id);
-		getline(gfin, temp_log.bor_client_id);
-		gfin >> temp_log.bor_time;
+	    getline(gfin, str);
+		getline(gfin, temp_log.bor_book_id);   //读取书的ID
 		getline(gfin, str);
-		gfin >> temp_log.bor_term;
+		getline(gfin, temp_log.bor_client_id); //读取借书用户/预约用户ID
 		getline(gfin, str);
-		getline(gfin, temp_log.bor_way);
-		gfin >> temp_log.bookfine;
+		gfin >> temp_log.bor_time;             //读取借书时间/预约时间
 		getline(gfin, str);
-		gfin >> temp_log.retu_book;
 		getline(gfin, str);
-		gfin >> temp_log.type_comm;
+		gfin >> temp_log.bor_term;             //读取借书时长/预约生效时间
+		getline(gfin, str);
+		getline(gfin, str);
+		getline(gfin, temp_log.bor_way);       //读取借书方式
+		getline(gfin, str);
+		gfin >> temp_log.bookfine;             //读取产生罚款
+		getline(gfin, str);
+		getline(gfin, str);
+		gfin >> temp_log.retu_book;            //读取书的借还状态
+		getline(gfin, str);
+		getline(gfin, str);
+		gfin >> temp_log.type_comm;            //读取保存类型，借书还是预约
+		getline(gfin, str);
 		getline(gfin, str);
 		//if((temp_log.type_comm==2)&&(temp_log.bor_time-book_system_time>temp_log.bor_term))
         //{
@@ -297,11 +399,10 @@ book_shelf::book_shelf()
 	gfin.clear();
 	gfin.close();
     }
-    cout << "Ready!" << endl;
 }
 
 
-
+/*******************************************************************************************************************************/
 sinbook & book_shelf::id_to_book(string bokide)        //书的id对应书结构
 {
     for(int i=0;i<(int)booklib.size(); i++)
@@ -332,7 +433,7 @@ int book_shelf::judg_ord_suc(string okid,string inid)
     return 0;
 }
 
-void book_shelf::statistic()
+void book_shelf::statistic()                                       //统计所有信息
 {
     int bonum,renum,unret,monu;//统计借书量，还书量，没换书的数目，营业额
     bonum=0;
@@ -342,17 +443,35 @@ void book_shelf::statistic()
     for(int i=0;i<(int)bor_record.size();i++)
     {
         if((bor_record[i].type_comm==1)&&(book_system_time-bor_record[i].bor_time<300))
+        {
+            cout<<id_to_book(bor_record[i].bor_book_id).name<<"被借"<<endl;
+            //cout<<bor_record[i].bor_book_id<<endl;
+            cout<<"借书人ID："<<bor_record[i].bor_client_id<<endl;
+            //cout<<"借书人姓名："<<library.id_to_client(bor_record[i].bor_client_id).name<<endl;
             ++bonum;
+        }
         if((bor_record[i].type_comm==1)&&((book_system_time-bor_record[i].retu_book<300)))
-           ++renum;
+        {
+            cout<<id_to_book(bor_record[i].bor_book_id).name<<"被还"<<endl;
+            //cout<<bor_record[i].bor_book_id<<endl;
+            cout<<"还书人ID："<<bor_record[i].bor_client_id<<endl;
+            //cout<<"还书人姓名："<<library.id_to_client(bor_record[i].bor_client_id).name<<endl;
+            ++renum;
+        }
         if(bor_record[i].retu_book==0)
+        {
+            cout<<id_to_book(bor_record[i].bor_book_id).name<<"未被还"<<endl;
+            //cout<<bor_record[i].bor_book_id<<endl;
+            cout<<"借书人ID："<<bor_record[i].bor_client_id<<endl;
+            //cout<<"借书人姓名："<<library.id_to_client(bor_record[i].bor_client_id).name<<endl;
             ++unret;
+        }
         monu=monu+bor_record[i].bookfine;
     }
-    cout<<"The number of books borrowed this month is:"<<bonum<<endl;
-    cout<<"The number of books returned this month is:"<<renum<<endl;
-    cout<<"The number of books unreturned this month is:"<<unret<<endl;
-    cout<<"This month's fine income is:"<<monu<<endl;
+    cout<<"本月被借走的书的数量:"<<bonum<<endl;
+    cout<<"本月被还回的书的数量:"<<renum<<endl;
+    cout<<"还未被还回的书的数量:"<<unret<<endl;
+    cout<<"本月罚款收入:"<<monu<<endl;
 }
 
 void book_shelf::borr_book(string bookid,string clinid)
@@ -363,13 +482,20 @@ void book_shelf::borr_book(string bookid,string clinid)
     {
         if(id_to_client(clinid).Arrears_money>10.0)
         {
-            cout<<"You already owe too much money!"<<endl;//此处可以添加还钱链接！以后添加吧！并不是主要程序，不优先
+            cout<<"你已经欠了太多金额!还款输入1，任意输入退出"<<endl;//此处可以添加还钱链接！以后添加吧！并不是主要程序，不优先
+            /*int temp=0;
+            cin>>temp;
+            if(temp==1)
+            {
+                library.renewclient(clinid,5);
+            }
+             */   //注释的原因是因为这里涉及到推出界面以后是继续还书还是推出页面，还书时需要用到goto语句
         }
         else
         {
             if(id_to_client(clinid).borrownum>4)
             {
-                cout<<"You have borrowed too many books!"<<endl;//此处可以添加还书链接！
+                cout<<"你已经借了太多的书!"<<endl;//此处可以添加还书链接！
             }
             else
             {
@@ -377,22 +503,22 @@ void book_shelf::borr_book(string bookid,string clinid)
                 //
                 if(id_to_book(bookid).state==1)
                 {
-
                     if(id_to_book(bookid).borrowpermission==0&&id_to_client(clinid).client_identity==1)
-                        cout<<"You don't have access to books. This book is for teachers!"<<endl;
+                        cout<<"您没有权限借阅!"<<endl;
                     else
                     {
                         borrow_mass exml;
                         exml.bor_book_id=bookid;
                         exml.bor_client_id=clinid;
-                        exml.bor_time=book_system_time;
-                        cout<<"please input the term you want borrow:";
-                        cin>>exml.bor_term;                    //可以加一个输入检查
+                        exml.bor_time=book_system_time;//系统当前时间
+                        cout<<"请输入您的借阅时间（天）:";
+                        cin>>exml.bor_term;  //可以加一个输入检查
+                        exml.bor_term=exml.bor_term*10;
                         exml.bookfine=0;
-						exml.type_comm = 1;
-                        exml.retu_book=0;
+						exml.type_comm = 1;//标明是借书
+                        exml.retu_book = 0;//标明是没有换书
 						if (Cur_log_denti == 1)
-							exml.bor_way = "admin";//后期写登陆以后可以写服务类型
+							exml.bor_way = "admin";//后期写登陆以后可以写服务类型//不得不承认时整个程序的失败之处
 						else
 							exml.bor_way = "yourself";
                         bor_record.push_back(exml);//填写借书记录完毕，开始修改信息
@@ -401,7 +527,7 @@ void book_shelf::borr_book(string bookid,string clinid)
                         ++(id_to_client(clinid).borrownum);//修改完顾客信息
 
                         id_to_book(bookid).state=0;
-                        cout<<"You have been successful by self-help books, enjoy reading, enjoy life!"<<endl;
+                        cout<<"您已成功借阅此书, 享受生活，享受阅读!"<<endl;
                     }
                    //judg_ord_suc(bookid,clinid)=1;
                 }
@@ -432,10 +558,10 @@ void book_shelf::borr_book(string bookid,string clinid)
                     ++id_to_client(clinid).borrownum;//修改完顾客信息
 
                     id_to_book(bookid).state=0;
-                    cout<<"You have been successful by self-help books, enjoy reading, enjoy life!"<<endl;
+                    cout<<"您已成功借阅此书, 享受生活，享受阅读!"<<endl;
                 }
                 else
-                    cout<<"There is no book in the library! So sorry!"<<endl;
+                    cout<<"对不起，此书不存在！"<<endl;
             }
         }
     }
@@ -501,7 +627,7 @@ void book_shelf::order_book(string bookid, string clinid)
 	{
 		if (id_to_client(clinid).Arrears_money > 10.0)
 		{
-			cout << "You already owe too much money!" << endl;//此处可以添加还钱链接！以后添加吧！并不是主要程序，不优先
+			cout << "You already owe too much money!" << endl;
 		}
 		else
 		{
@@ -544,9 +670,43 @@ void book_shelf::order_book(string bookid, string clinid)
 
 void book_shelf::order_dele_book(string clinid)
 {
+    if((int)id_to_client(clinid).orderbooknum==0)
+        return;
+    cout<<"你已经预约了以下书，以及他们现在的状态："<<endl;
+    vector <int> reserve;
+    string serbook[(int)id_to_client(clinid).orderbooknum];
     for(int i=0;i<(int)id_to_client(clinid).orderbooknum;i++)
     {
+        cout<<"书名"<<id_to_book(id_to_client(clinid).orderbookid[i]).name;
+        serbook[i]=id_to_client(clinid).orderbookid[i];
         if(id_to_book(id_to_client(clinid).orderbookid[i]).state==1)
+        {
+            cout<<"在馆！"<<endl;
+            cout<<"输入1，借书，其他，忽略"<<endl;
+            int tempp;
+            cin>>tempp;
+            if(tempp==1)
+                borr_book(id_to_client(clinid).orderbookid[i],clinid);//人的记录最后清理
+            for (int j = 0;j<(int)bor_record.size();j++)
+            {
+                if(bor_record[j].bor_book_id == id_to_client(clinid).orderbookid[j]&&bor_record[j].type_comm == 2&&bor_record[j].retu_book==0)
+                {
+                    bor_record[j].retu_book==book_system_time;
+                    break;
+                }
+            }
+
+        }
+        else if(id_to_book(id_to_client(clinid).orderbookid[i]).state==0)
+             {
+                 cout<<"借出！"<<endl;
+                 reserve.push_back(i);
+             }
+        else
+            cout<<"书被删除！"<<endl;
+
+
+        /*if(id_to_book(id_to_client(clinid).orderbookid[i]).state==1)
         {
 
             cout<<"you order book"<<id_to_client(clinid).orderbookid[i]<<"arrive,input 1 to borrow,others ignore:";
@@ -567,7 +727,14 @@ void book_shelf::order_dele_book(string clinid)
                     bor_record[j].retu_book=book_system_time;
             }//销毁所有有关的图书记录
         }
+        */
     }
+    for(int i=0;i<(int)reserve.size();i++)
+    {
+        id_to_client(clinid).orderbookid[i]=serbook[reserve[i]];
+    }
+    id_to_client(clinid).orderbooknum=(int)reserve.size();
+    return;
 }
 
 void book_shelf::displaybook(sinbook boid)
@@ -597,12 +764,17 @@ void book_shelf::display_client(boclient cl_id)
     else
         cout<<"\ttype:student";
     cout<<"\tinstitute:"<<cl_id.institute<<"\tcreattime:"<<cl_id.creat_time
-        <<"\tid:"<<cl_id.clid<<"\thonest tevel:"<<cl_id.honestlevel<<endl;
+        <<"\tid:"<<cl_id.clid<<"\thonest tevel:"<<cl_id.honestlevel;
+        if(cl_id.Arrears_money<0)
+            cout<<"\tmoney:0"<<"   您还有："<<0-cl_id.Arrears_money<<"RMB"<<endl;
+        else
+            cout<<"\tmoney:"<<cl_id.Arrears_money<<endl;
     if(cl_id.borrownum>0)
     {
         cout<<"you have borrowed "<<cl_id.borrownum<<"book,interesting!"<<endl;
         for(int i=0; i<cl_id.borrownum; i++)
-            displaybook(id_to_book(cl_id.borrowid[i]));
+            {//displaybook(id_to_book(cl_id.borrowid[i]));
+            cout<<cl_id.borrowid[i]<<endl;}
     }
     else
         cout<<"no borrow information!"<<endl;
@@ -796,38 +968,45 @@ void book_shelf::renewbook(string renewid,int renew_choice)               //更�
     }
     if(searbookinf!=-1)
     {
-
         switch (renew_choice)
         {
         case 1:
         {
-            cout<<"Please input book type:";
+            cout<<"请输入新的类型:";
             cin>>booklib[searbookinf].type;
+            break;
         }
         case 2:
         {
-            cout<<"Please input book name:";
+            cout<<"请输入新的名字:";
             cin>>booklib[searbookinf].name;
+            break;
+
         }
         case 3:
         {
-            cout<<"Please input book author:";
+            cout<<"请输入新的作者:";
             cin>>booklib[searbookinf].author;
+            break;
+
         }
         case 4:
         {
-            cout<<"Please input book press:";
+            cout<<"请输入新的出版社:";
             cin>>booklib[searbookinf].press;
+            break;
+
         }
         case 5:
         {
-            cout<<"Please input book price:";
+            cout<<"请输入新的价格:";
             cin>>booklib[searbookinf].price;
+            break;
         }
         }
     }
     else
-        cout<<"error id to search"<<endl;
+        cout<<"输入了错误的ID！"<<endl;
 }
 
 void book_shelf::renewclient(string renewid,int renew_choice)
@@ -844,31 +1023,46 @@ void book_shelf::renewclient(string renewid,int renew_choice)
         {
         case 1:
         {
-            cout<<"please input the new name:";
+            cout<<"请输入新姓名:";
             cin>>suclient[searcliinf].name;
+            cout<<"修改成功！"<<endl;
+            break;
         }
         case 2:
         {
-            cout<<"please input the new institude:";
+            cout<<"请输入新学院:";
             cin>>suclient[searcliinf].institute;
+            cout<<"修改成功！"<<endl;
+            break;
+
         }
-        case 3:                                //还款，特殊功能
+        case 5:                                //还款，特殊功能
         {
-            cout<<"please input the money:";
+            cout<<"请输入充值金额:";
             int num;
             cin>>num;
 
-            suclient[searcliinf].Arrears_money=suclient[searcliinf].Arrears_money+num;
+            suclient[searcliinf].Arrears_money=suclient[searcliinf].Arrears_money-num;
+            cout<<"充值成功！"<<endl;
+            break;
         }
         case 4:
         {
-            cout<<"please input the new password:";
+            cout<<"请输入新密码:";
             cin>>suclient[searcliinf].cli_pass_word;
+            cout<<"修改成功！"<<endl;
+            break;
         }
+        case 3:
+            {
+                cout<<"请输入新ID:";
+                cin>>suclient[searcliinf].clid;
+                cout<<"修改成功！";
+            }
         }
     }
     else
-        cout<<"error id of client"<<endl;
+        cout<<"错误的ID"<<endl;
 }
 
 
@@ -876,73 +1070,115 @@ void book_shelf::search_book_shelf(int num,string inf)
 {
     switch (num)
     {
-    case 1:           //查询类型
+    case 1:           //查询类型                               按书的类型查询
     {
+        int j=0;
         for(int i=0; i<(int)booklib.size(); i++)
         {
             if(booklib[i].type==inf)
             {
+                ++j;
                 cout<<booklib[i].id<<endl;
                 cout<<booklib[i].name<<endl;
             }
         }
-    }
-    case 2:
+        if(j)
+            cout<<"查询成功！"<<endl;
+        else
+            cout<<"查询失败，该信息不存在。"<<endl;
+    }break;
+    case 2:                                          //按书的购入时间查询
     {
+        int j=0;
         for(int i=0; i<(int)booklib.size(); i++)
         {
             if(booklib[i].buytime==stringtoint(inf))
             {
+                ++j;
                 cout<<booklib[i].id<<endl;
                 cout<<booklib[i].name<<endl;
             }
         }
-    }
-    case 3:
+        if(j)
+            cout<<"查询成功！"<<endl;
+        else
+            cout<<"查询失败，该信息不存在。"<<endl;
+    }break;
+    case 3:                                                 //按书的名字查询
     {
+        int j=0;
         for(int i=0; i<(int)booklib.size(); i++)
         {
-            if(booklib[i].name==inf)
+            if(str_dist(booklib[i].name,inf)<=4)
             {
-                cout<<booklib[i].id<<endl;
+                ++j;
+                cout<<"ID: "<<booklib[i].id<<"书名："<<booklib[i].name<<endl;
             }
+            /*if(booklib[i].name==inf)
+            {
+                ++j;
+                cout<<booklib[i].id<<endl;
+            }*/
         }
-    }
-    case 4:
+        if(j)
+            cout<<"查询成功！"<<endl;
+        else
+            cout<<"查询失败，该信息不存在。"<<endl;
+    }break;
+    case 4:                                                   //按书的作者查询
     {
+        int j=0;
         for(int i=0; i<(int)booklib.size(); i++)
         {
             if(booklib[i].author==inf)
             {
+                ++j;
                 cout<<booklib[i].id<<endl;
                 cout<<booklib[i].name<<endl;
             }
         }
-    }
-    case 5:
+        if(j)
+            cout<<"查询成功！"<<endl;
+        else
+            cout<<"查询失败，该信息不存在。"<<endl;
+    }break;
+    case 5:                                         //按书的出版社查询
     {
+        int j=0;
         for(int i=0; i<(int)booklib.size(); i++)
         {
             if(booklib[i].press==inf)
             {
+                ++j;
                 cout<<booklib[i].id<<endl;
                 cout<<booklib[i].name<<endl;
             }
         }
-    }
-    case 6:                                      //出版社
+        if(j)
+            cout<<"查询成功！"<<endl;
+        else
+            cout<<"查询失败，该信息不存在。"<<endl;
+    }break;
+    case 6:                                      //按书的价格查询
     {
+        int j=0;
         for(int i=0; i<(int)booklib.size(); i++)
         {
             if(booklib[i].price==stringtoint(inf))
             {
+                ++j;
                 cout<<booklib[i].id<<endl;
                 cout<<booklib[i].name<<endl;
             }
         }
-    }
+        if(j)
+            cout<<"查询成功！"<<endl;
+        else
+            cout<<"查询失败，该信息不存在。"<<endl;
+    }break;
     default:
-        cout<<"error infomation"<<endl;
+        cout<<"输入错误！"<<endl;
+        break;
     }
 
     //可以构建查询记录，构建热搜榜，文件
@@ -972,6 +1208,7 @@ void book_shelf::search_client_inf(int num,string inf)
         cout<<"error choice!"<<endl;
     }
 }
+
 typedef struct __THREAD_DATA
 {
     int localtime;
@@ -993,11 +1230,10 @@ DWORD WINAPI ThreadProc(LPVOID lpParameter)
 
 int main(void)
 {
-    //cout<<"hhhh"<<endl;
     book_shelf library;
     int acc;
     string pasword;
-    cout<<"                                          Welcome to the BUPT library management system"<<endl;
+    cout<<"                           欢迎来到图书管理系统"<<endl;
 
 	//线程隔离区，登陆在前，操作在while循环中
 	g_hMutex = CreateMutex(NULL, FALSE, NULL);
@@ -1014,21 +1250,23 @@ int main(void)
 	HANDLE hThread1 = CreateThread(NULL, 0, ThreadProc, &threadData, 0, NULL);//线程启动，时间运行
 	CloseHandle(hThread1);
 	//xianchenggeli
-	cout<<"do you want to add new id?1: add,others: no"<<endl;
+	/*cout<<"do you want to add new id?1: add,others: no"<<endl;
 	int temp_num_sta;
 	cin>>temp_num_sta;
 	if(temp_num_sta==1)
-	library.new_client();
+	library.new_client();*/
 reload_systerm:
     while(true)
     {
-         cout<<"Please enter your account number:";
-         cin>>acc;
+        cout<<"请输入您的ID:";
+        cin.clear();
+        cin.sync();
+        cin>>acc;
 
-		 if (acc == -1)
-			 return 0;//直接退出程序
-         cout<<"Please enter your password:";
-         cin>>pasword;
+        if (acc == -1)
+            return 0;//直接退出程序
+        cout<<"请输入您的密码:";
+        cin>>pasword;
         string exm_name;
         exm_name=inttostring(acc);
         int judg_temp=0;
@@ -1044,12 +1282,12 @@ reload_systerm:
         }
         if(judg_temp==1)
             break;
-        cout<<"Wrong login or password, please login again,If you want to close the program,cin>>-1"<<endl;
+        cout<<"用户名或密码错误！请重新输入。退出系统请输入-1."<<endl;
     }
     if(library.id_to_client(pasword).client_identity==2)
     {
         Cur_log_denti=1;
-        cout<<"You are the administrator!"<<endl;
+        cout<<"您是该系统管理员!"<<endl;
     }
     else
         Cur_log_denti=stringtoint(pasword);//成功赋值当前登陆人员，
@@ -1059,6 +1297,7 @@ reload_systerm:
 
 		while (true)
 		{
+		    WaitForSingleObject(g_hMutex, INFINITE);
 			cout << "\tcin>>1.所有图书 " << endl;
 			cout << "\tcin>>2.查询图书 " << endl;
 			cout << "\tcin>>3.增加图书 " << endl;
@@ -1067,14 +1306,17 @@ reload_systerm:
 			cout << "\tcin>>6.归还图书 " << endl;
 			cout << "\tcin>>7.修改图书 " << endl;
 			cout << "\tcin>>8.本月统计 " << endl;//300次sleep后算一个月
-
-			cout << "\tcin>>7.修改图书 " << endl;
 			cout << "\tcin>>9.退出登录，重新登陆" << endl;
 			cout << "\tcin>>10.退出登录，关闭系统" << endl;
 			cout << "\tcin>>11.创建账户 " << endl;
 			cout << "\tcin>>12.更改账户 " << endl;
 			cout << "\tcin>>13.充值账户 " << endl;
+			cout << "\tcin>>14.display账户 " << endl;
+			cout<<"请选择服务类型：";
 			cin >> choice_syst;
+			if(choice_syst>15||choice_syst<1)
+			 choice_syst=1;
+
 			switch (choice_syst)
 			{
 			case 1:
@@ -1084,125 +1326,128 @@ reload_systerm:
 			}
 			case 2://查询
 			{
-				cout << "please input search information" << endl;
+				cout << "请输入查询类型：" << endl;
 				int temp_choice;
-				WaitForSingleObject(g_hMutex, INFINITE);
+				cout<<"1.按书的类型查询    2.按书的购入时间查询   3.按书名查询"<<endl
+				<<"4.按作者查询        5.按出版社查询         6.按价格查询"<<endl;
 				cin >> temp_choice;
+				cout<<"请输入查询信息："<<endl;
 				string temp_inf;
 				cin >> temp_inf;
-				ReleaseMutex(g_hMutex);
 				library.search_book_shelf(temp_choice, temp_inf);
 				break;
             }
 			case 3://增加图书
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
 				library.buybook();
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case 4://删除图书
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
 				string temp_nam_book;
-				cout << "input the id you want delete!" << endl;
+				cout << "请输入你想删除的书的ID!：" << endl;
 				cin>> temp_nam_book;
 				library.delet_book(temp_nam_book);
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case 5:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
-				cout << "you need input the name youwant borrow" << endl;
 				string temp_b,temp_c;
-				cin.clear();
-				cout<<"please input the bookid:";
+				cout<<"请输入书的ID：";
 				cin >> temp_b;
                 cin.clear();
-                cout<<"please input the client id:";
+                cout<<"请输入客户的ID：";
 				cin >> temp_c;
 				library.borr_book(temp_b,temp_c);
-				ReleaseMutex(g_hMutex);
                 break;
 			}
 			case 6:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
-				cout << "input the name you want return!" << endl;
+				cout << "请输入你要返回的书的ID：";
 				string temp_b;
 				cin>>temp_b;
 				library.back_book(temp_b);
-				ReleaseMutex(g_hMutex);
                 break;
 			}
 			case 7:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
 				int temp_cho;
 				string temp_b;
-				cin >> temp_cho;
+				cout<<"请输入要修改书的ID：";
 				cin >> temp_b;
+				cout<<"请选择修改类型：1.书类型  2.名字   3.作者   4.出版社   5.价格"<<endl;
+				cin >> temp_cho;
 				library.renewbook(temp_b,temp_cho);
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case  8:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
 				library.statistic();
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case 9:
 			{
+			    ReleaseMutex(g_hMutex);
+			    cout<<"当前时间（天）："<<book_system_time/10<<endl;
 				goto reload_systerm;
 				break;
 			}
 			case 10:
 			{
+			    cout<<"当前时间（天）："<<book_system_time/10<<endl;
 				return 0;
-
+				break;
 			}
 			case 11:
                 {
-                WaitForSingleObject(g_hMutex, INFINITE);
 				library.new_client();
-				ReleaseMutex(g_hMutex);
 				break;
                 }
             case 12:
                 {
-                    WaitForSingleObject(g_hMutex, INFINITE);
-                    cout<<"please input renewid:";
+                    cout<<"请输入ID:";
                     string temp_cli;
                     cin>>temp_cli;
-                    cout<<"please input choice:";
-                    cout<<"1:name;2:institute:";
+                    cout<<"请选择更改的信息:";
+                    cout<<"1:姓名  2.学院  3.ID 4.密码"<<endl;
                     int num;
                     cin>>num;
-				library.renewclient(temp_cli,num);
-				ReleaseMutex(g_hMutex);
-				break;
+				    library.renewclient(temp_cli,num);
+				    break;
                 }
             case 13:
                 {
-                    WaitForSingleObject(g_hMutex, INFINITE);
-                    cout<<"please input renewid:";
+                    cout<<"请输入充值ID：:";
                     string temp_cli;
                     cin>>temp_cli;
-                    library.renewclient(temp_cli,3);
-                    ReleaseMutex(g_hMutex);
+                    library.renewclient(temp_cli,5);
+                    break;
+                }
+            case 14:
+                {
+                    cout<<"展示所有人的信息？  1.是   0.不是"<<endl;
+                    int temp_ttt;
+                    cin>>temp_ttt;
+                    if(temp_ttt==1)
+                        library.display_client();
+                    else
+                    {
+                        cout<<"请输入要展示的客户ID：";
+                        string ClientId;
+                        cin>>ClientId;
+                        boclient client=library.id_to_client(ClientId);
+                        library.display_client(client);
+                    }
+
+                    break;
                 }
 			default:
 			{
 				cout << "Please re-enter" << endl;
-				cin>>choice_syst;
 				break;
 			}
 			}
 		}
-
 	}
 	else {
         library.order_dele_book(inttostring(Cur_log_denti));
@@ -1215,6 +1460,8 @@ reload_systerm:
 			cout << "\tcin>>5.预约图书 " << endl;
 			cout << "\tcin>>6.退出登录，重新登陆" << endl;
 			cout << "\tcin>>7.退出登录，关闭系统" << endl;
+			cout << "\tcin>>8.查询个人信息"<<endl;
+			cout<<"请选择服务类型：";
 			int choice_syst;
 			cin >> choice_syst;
 			switch (choice_syst)
@@ -1226,57 +1473,66 @@ reload_systerm:
 			}
 			case 2:
 			{
-				cout << "please input search information" << endl;
+				cout << "请输入查询类型：";
 				int temp_choice;
-				WaitForSingleObject(g_hMutex, INFINITE);
+				cout<<"1.按书的类型查询    2.按书的购入时间查询   3.按书名查询"<<endl
+				<<"4.按作者查询        5.按出版社查询         6.按价格查询"<<endl;
 				cin >> temp_choice;
+				cout<<"请输入查询信息：";
 				string temp_inf;
 				cin >> temp_inf;
-				ReleaseMutex(g_hMutex);cin >> temp_choice;
 				library.search_book_shelf(temp_choice, temp_inf);
 				break;
 			}
 			case 3:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
-				cout << "you need input the name youwant borrow" << endl;
+				cout << "请输入你想要借的书的ID：";
 				string temp_c;
 				cin >> temp_c;
 				library.borr_book(temp_c,inttostring(Cur_log_denti));
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case 4:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
-				cout << "input the name you want return!" << endl;
+				cout << "请输入你要还的书的ID：";
 				string temp_b;
+				cin>>temp_b;
 				library.back_book(temp_b);
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case 5:
 			{
-				WaitForSingleObject(g_hMutex, INFINITE);
-				cout << "input the book you want order";
+				cout << "请输入你要预约的书的ID：";
 				string temp_b;
 				cin >> temp_b;
 				library.order_book(temp_b, inttostring(Cur_log_denti));
-				ReleaseMutex(g_hMutex);
 				break;
 			}
 			case 6:
 			{
+			    ReleaseMutex(g_hMutex);
+			    cout<<"当前时间（天）："<<book_system_time/10<<endl;
 				goto reload_systerm;
+				break;
 			}
 			case 7:
-				return 0;
+            {
+                cout<<"当前时间（天）："<<book_system_time/10<<endl;
+                return 0;
+				break;
+            }
+            case 8:
+            {
+                boclient client=library.id_to_client(inttostring(Cur_log_denti));
+                library.display_client(client);
+                break;
+            }
 			default:
 			{
 				cout << "Please re-enter" << endl;
+				break;
 			}
 			}
-
 		}
 	}
     return 0;
