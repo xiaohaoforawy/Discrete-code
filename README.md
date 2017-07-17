@@ -1,5 +1,5 @@
 # Discrete code #
-##### [Click here contact with me](https://www.facebook.com/profile.php?id=100012707676684)<br /> #####
+##### [Click here contact with me](https://awybupt.github.io/Discrete-code/)<br /> #####
 ##### buptmike@gmail.com #####
 ##### Mobile:+86-13051957575 #####
 
