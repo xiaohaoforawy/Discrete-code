@@ -9,13 +9,14 @@
     * Neural Networks: Tricks of the Trade
     * Neural Smithing:Supervised learning in Feedforward Artificial Neural Networks
 * 试推导用于Elman网络的BP算法。
-```java
+```go
 Elman比正常网络多了个反馈，把前一次的bh作为隐层的输入来调节隐层。 
 假设用uih来表示反馈输入与隐层连接的参数，由于前一次计算的bh作为常数输入
 uij与vij的计算方法一样，Δuih=ηehbh，其中e_h书上5.15给出。
 就是相当于多了几个输入会变的输入层神经元。
 ```
-
+[Neural Network](http://playground.tensorflow.org)
+三天才看完神经网络，接下来就是聚类
 
 
 
