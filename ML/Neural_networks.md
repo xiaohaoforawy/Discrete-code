@@ -17,6 +17,4 @@ uij与vij的计算方法一样，Δuih=ηehbh，其中e_h书上5.15给出。
 ```
 [Neural Network](http://playground.tensorflow.org)
 三天才看完神经网络，接下来就是聚类
-
-
-
+[相关问题/代码](http://blog.csdn.net/golden1314521/article/details/45053809#t1)
