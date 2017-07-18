@@ -75,3 +75,4 @@ def Test():
         if math.argmax(out_act) == test_label[i]:
           right[test_label[i]] += 1
     print(right.sum()/ len(test_label))
+    
