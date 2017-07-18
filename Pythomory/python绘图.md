@@ -1,1 +1,7 @@
-[click here!](http://blog.csdn.net/golden1314521/article/details/44700551#comments)
+* [oython绘图](http://blog.csdn.net/golden1314521/article/details/44700551#comments)
+* [论文注意事项](http://blog.csdn.net/golden1314521/article/details/50435291)
+* [P/NP](http://blog.csdn.net/golden1314521/article/details/51470999)
+* [美团笔记](http://blog.csdn.net/golden1314521/article/details/50366992)
+* [图论](http://blog.csdn.net/golden1314521/article/details/42871609)
+* [泛函分析](http://blog.csdn.net/golden1314521/article/details/51180355)
+* [机器学习](http://blog.csdn.net/u012176591/article/category/2333485)
