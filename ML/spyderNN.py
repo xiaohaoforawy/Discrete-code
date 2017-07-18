@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Spyder Editor
-design by Awybuot
+design by Awybupt
 This is a temporary script file.
 first try,happy
 2017/07/18
