@@ -58,33 +58,40 @@ b2 = 0.5*np.random.rand(outdim,1)-0.1
 
 errhistory = []
 
-for i in range(maxepochs):
-    hiddenout = logsig((np.dot(w1,sampleinnorm).transpose()+b1.transpose())).transpose()
-    networkout = (np.dot(w2,hiddenout).transpose()+b2.transpose()).transpose()
-    err = sampleoutnorm - networkout
-    sse = sum(sum(err**2))
+def TrainNetwork(sample,lebal):
+    sample_num=len(sample)
+    sample_len=len(sample[0])
+    import math
+    out_num = 10
+    hid_num = 8
+    w1 = 0.2*math.random.random((sample_len,hid_num))-0.1
+    w2 = 0.2*math.random.random((hid_num,out_num))-0.1
+    hid_offset = math.zeros(hid_num)
+    out_offset = math.zeros(out_num)
+    input_learnrate=0.2
+    hid_learnrate=0.2
+    for i in range(0,len(sample)):
+        t_label = math.zeros(out_num)
+        t_label[label[i]] = 1
+        # 前向的过程
+        hid_value = math.dot(sample[i], w1) + hid_offset  # 隐层的输入
+        hid_act = get(hid_value)  # 隐层对应的输出
+        out_value = math.dot(hid_act, w2) + out_offset
+        out_act = get(out_value)  # 输出层最后的输出
 
-    errhistory.append(sse)
-    if sse < errorfinal:
-        break
+        # 后向过程
+        err = t_label - out_act
+        out_delta = err * out_act * (1 - out_act)  # 输出层的方向梯度方向
+        hid_delta = hid_act * (1 - hid_act) * math.dot(w2, out_delta)
+        for j in range(0, out_num):
+            w2[:, j] += hid_learnrate * out_delta[j] * hid_act
+        for k in range(0, hid_num):
+            w1[:, k] += input_learnrate * hid_delta[k] * sample[i]
 
-    delta2 = err
+        out_offset += hid_learnrate * out_delta  # 阈值的更新
+        hid_offset += input_learnrate * hid_delta
 
-    delta1 = np.dot(w2.transpose(),delta2)*hiddenout*(1-hiddenout)
-
-    dw2 = np.dot(delta2,hiddenout.transpose())
-    db2 = np.dot(delta2,np.ones((samnum,1)))
-
-    dw1 = np.dot(delta1,sampleinnorm.transpose())
-    db1 = np.dot(delta1,np.ones((samnum,1)))
-
-    w2 += learnrate*dw2
-    b2 += learnrate*db2
-
-    w1 += learnrate*dw1
-    b1 += learnrate*db1
-
-
+    return w1, w2, hid_offset, out_offset
 
 
 # 误差曲线图
