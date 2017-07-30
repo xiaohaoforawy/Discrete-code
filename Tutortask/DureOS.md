@@ -17,3 +17,4 @@
      * 场景选择，操作系统选择，服务信息配置，下载sdk环境
 * DCS协议
      * 
+muqian de zhuangkuangshi wobunengyouxiaoliyong xinxi 
