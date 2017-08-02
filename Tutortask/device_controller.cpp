@@ -67,3 +67,4 @@ void device_controller_init(void)
     };
     Scheduler::instance().add_controll_points(res, sizeof(res) / sizeof(res[0]));
 }
+//代码内联
