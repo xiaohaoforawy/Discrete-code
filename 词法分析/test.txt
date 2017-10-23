@@ -1,0 +1,10 @@
+#include <iostream>
+int main(void)//hello!@#$%&
+{
+int i=0;
+float tim=2323.4523;
+for(int j=0;j<i;j++)
+{
+cout<<"hello world!"<<endl;
+}
+}
