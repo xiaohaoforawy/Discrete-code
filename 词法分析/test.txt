@@ -1,8 +1,14 @@
 #include <iostream>
 int main(void)//hello!@#$%&
 {
-int i=0;
+//hello
+
+int i=0;/*fhf*/int name;
 float tim=2323.4523;
+/*qweqeqwqweqweqw
+qweqweqwe
+qweqwe
+*/
 for(int j=0;j<i;j++)
 {
 cout<<"hello world!"<<endl;

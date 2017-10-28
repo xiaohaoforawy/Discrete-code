@@ -1,13 +1,9 @@
-//
 //  letx.hpp
-//  词法分析
-//
 //  Created by 魏晓 on 10/23/17.
 //  Copyright © 2017 魏晓. All rights reserved.
-//
-
 #ifndef letx_hpp
 #define letx_hpp
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -62,6 +58,7 @@ private:
     std::string in; // 输入
     std::string cut(int i, int j); // 截取in的字符串[i, j)
     std::vector<Ans> Lans;//存放输入
+    bool duohang;
 public:
     Lexical();
     ~Lexical();

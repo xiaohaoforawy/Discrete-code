@@ -1,14 +1,10 @@
-//
-//  letx.cpp
-//  词法分析
-//
 //  Created by 魏晓 on 10/23/17.
 //  Copyright © 2017 魏晓. All rights reserved.
-//
-//改进要点：
-//1：正则表达式匹配
-//2：查找字典树返回结果不正确
-//3：
+/*改进要点：
+* 1：正则表达式匹配
+* 2：查找字典树返回结果不正确
+* 3：注释处理!!!!
+*/
 #include <regex>
 #include "letx.hpp"
 #include <fstream>
@@ -70,7 +66,7 @@ Lexical::Lexical() {
         "else","long","swtich","case","typedf","char",
         "return","const","float","short","continue",
         "for","void","sizeof","string","cout","cin",
-        "include","define"};
+        "include","define","endl"};
     optrs={ {"+","ARITHMETICOPTR"},{"-","ARITHMETICOPTR"},{"*","ARITHMETICOPTR"},{"/","ARITHMETICOPTR"},
             {"%","ARITHMETICOPTR"},{"++","ARITHMETICOPTR"},{"--","ARITHMETICOPTR"},
             {">>","ARITHMETICOPTR"},{"<<","ARITHMETICOPTR"},{"&","ARITHMETICOPTR"},{",","DELIMITER"},
@@ -81,6 +77,7 @@ Lexical::Lexical() {
     row=0;
     column=0;
     cha=0;
+    duohang=true;
 }
 Lexical::~Lexical() {
     cout<<"This file has\t"<<row-1<<"row\t"<<column<<"col\t"<<cha<<"char\t"<<endl;
@@ -122,17 +119,28 @@ string Lexical::isOptr(std::string str) {
 string Lexical::processspace(std::string str) {
     string temp="";
     auto n=(int)str.length();
-    //bool duohang=false;
-    for(int i=0;i<n&&(str[i-1]!='/'&&str[i]!='/');i++) {
-        if(str[i]!=' '&&str[i]!='\t') temp=temp+str[i];
-        if(str[i-1]!=' '&&str[i]==' '&&i>1) temp+=' ';
-    }
-    int signal=0;
-    for(int i=0;i<n&&(str[i-1]!='/'&&str[i]!='/');i++) signal=i+1;
-    string ttr;
-    ttr=cut(signal,n);
-    if(ttr.size()>=2) cout<<"注释:"<<ttr<<"\t行号:"<<row<<endl;
-    return temp;
+    int i;
+        for(i=0;i<n;i++){
+            if(duohang==false){
+                string com="";
+                for(int m=i;m<n&&duohang==false;m++,i++){
+                    if(str[m-1]=='*'&&str[m]=='/') duohang=true;
+                    com+=str[m];
+                    }
+                i=i-1;
+                cout<<"Comment:"<<com<<"location:"<<row<<endl;
+            }
+            else if(str[i]=='/'&&str[i+1]=='/'){
+                string com="";
+                for(int m=i;m<n;m++) com+=str[m];
+                cout<<"Comment:"<<com<<"location:"<<row<<endl;
+                break;
+            }
+            else if(str[i]=='/'&&str[i+1]=='*') duohang=false;
+            else if(str[i]!=' '&&str[i]!='\t') temp=temp+str[i];
+            if(str[i-1]!=' '&&str[i]==' '&&i>1) temp+=' ';
+        }
+        return temp;
 }
 void Lexical::analysis() {
     in=processspace(in);
@@ -186,8 +194,8 @@ void Lexical::analysis() {
             char temp=in[i+1];
             column++;
             if("ERR"!=isOptr(string(1,temp))){
-                s=in[i];
-                s=s+in[i+1];
+                s=C;
+                s=s+string(1,temp);
                 i+=1;
             }
             else
@@ -220,7 +228,7 @@ void Lexical::analysis() {
                 Ans te={s,"ERROR CHAR",row,column,"$"};
                 Lans.push_back(te);
             }
-            i=j-1;
+            i=j;
         }
         else if(C!=' '){
             column++;
@@ -231,28 +239,29 @@ void Lexical::analysis() {
 }
 void Lexical::run() {
     int choice;
-    cout<<"file?if you want file input,please press 1:";
+    cout<<"If you want input file,please press 1:";
     cin>>choice;
     if(choice==1) {
         fstream  fin;
         fin.open("/Users/weixiao/Documents/Xcode/词法分析/词法分析/test.txt",fstream::in);
-        while(!fin.eof()&&row<=35){
+        while(!fin.eof()){
             getline(fin,in);
             ++row;
             analysis();
         }
     }
     else {
-        cout<<"输入\"$$$\""<<"结束"<<endl;
-        while (getline(cin, in) && in != "$$$") {
+        cout<<"input\"$\"to exit"<<endl;
+        while (getline(cin, in) && in != "$") {
             ++row;
             analysis();
+            show();
         }
     }
 }
 void Lexical::show() {
     unsigned long len=Lans.size();
     for(int i=0;i<len;i++) {
-    cout<<"\t\t"<<Lans[i].sign<<"\t\t\t\t\t"<<Lans[i].type<<"\t\t\t\t\tLocation:("<<Lans[i].hang<<","<<Lans[i].lie<<")"<<endl;
+    cout<<"\t"<<Lans[i].sign<<"\t\t\t\t"<<Lans[i].type<<"\t\t\t\t\tLocation:("<<Lans[i].hang<<","<<Lans[i].lie<<")$"<<endl;
     }
 }
