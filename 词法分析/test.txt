@@ -12,5 +12,6 @@ qweqwe
 for(int j=0;j<i;j++)
 {
 cout<<"hello world!"<<endl;
+123preview//error 
 }
 }
