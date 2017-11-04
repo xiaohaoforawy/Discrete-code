@@ -1,0 +1,16 @@
+Atrain.speed=1     Atrain.X=4    Atrain.Y=4     Atrain.starttime=1
+Atrain.inpoint X=4            Atrain.inpoint Y=6   
+Atrain.outpoint X=4            Atrain.outpoint Y=4 
+Atrain.stationnum=1        
+Atrain.stationinf [1] X=2    Atrain.stationinf [1] Y=6        Atrain.stationinf [1] STOPTIME=3
+Btrain.speed=1     Btrain.X=4     Btrain.Y=7    Btrain.starttime=1
+Btrain.inpoint X=4             Btrain.inpoint Y=6 
+Btrain.outpoint X=4            Btrain.outpoint Y=4 
+Btrain.stationnum=2        
+Btrain.stationinf [1] X=6    Btrain.stationinf [1] Y=4       Btrain.stationinf [1] STOPTIME=3
+Btrain.stationinf [1] X=6  Btrain.stationinf [2] Y=6        Btrain.stationinf [2] STOPTIME=3
+Ctrain.speed=1     Ctrain.X=3     Ctrain.Y=3    Ctrain.starttime=1
+Ctrain.inpoint X=3             Ctrain.inpoint Y=4 
+Ctrain.outpoint X=1            Ctrain.outpoint Y=4 
+Ctrain.stationnum=1        
+Ctrain.stationinf [1] X=2    Ctrain.stationinf [1] Y=0       Ctrain.stationinf [1] STOPTIME=3
