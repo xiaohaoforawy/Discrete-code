@@ -243,7 +243,7 @@ void Lexical::run() {
     cin>>choice;
     if(choice==1) {
         fstream  fin;
-        fin.open("/Users/weixiao/Documents/Xcode/词法分析/词法分析/test.txt",fstream::in);
+        fin.open("测试文件.txt",fstream::in);
         while(!fin.eof()){
             getline(fin,in);
             ++row;
