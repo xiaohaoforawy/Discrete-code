@@ -1,0 +1,100 @@
+\documentclass[12pt,a4paper]{article}
+%\usepackage{ctex}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+
+
+\begin{document}
+
+
+%\tableofcontents
+\title{Analysis of Numpy Computing Efficiency}
+
+\author{\href{http://awy.ink/contact}{Wei Xiao}\thanks{I am grateful to the PLPP teacher for supervise me during this course.}}
+
+\date{\small \today}
+
+\maketitle
+
+\begin{abstract}
+
+The NumPy system is an open source, high-performance numerical computing extension package for the Python language.
+ Its performance usually affects the efficiency of the entire program. 
+ We analyze the memory management rules of Numpy on a Python virtual machine, the Python virtual machine on the instruction set, the operation to find the optimal calculation efficiency.
+We use the Python built-in tools such as cProfile, \%timeit, and memory\_profiler to analyze the performance of the function. We measure the different computational efficiency of different function statements.
+Finally based on the above analysis gives a part of the recommendations to improve the efficiency of the implementation\footnote{This isn't the last title.With more study in high performance of Python.I may change to another title.}
+\end{abstract}
+
+\newpage
+
+\section{Introduction}
+The introduction section mainly describes the python language, the main problem of low efficiency, the cost of the type judgment, memory operation, etc.
+
+\section{Numpy System}
+
+\subsection{Environment}
+
+\subsubsection{Python virtual machine}
+
+Introducting the basic concepts of Python virtual machine\cite{a1}...
+\subsubsection{Numpy background}
+The Numpy is developed by C,Fortran,shell... 
+
+\subsection{Memory Rule}
+
+\subsubsection{List}
+Application and release rules of memory in the Numpy list\cite{a2}
+\subsubsection{tuple}
+Rules for the management of elements in Numpy tuples.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.7\textwidth]{a.jpg}
+	\caption{The difference of range and xrange}
+\end{figure}
+
+\section{Optimization of the status}
+
+\subsection{Computing optimization}
+there are another reason of using CPU
+\begin{equation}
+	E=mc^2
+\end{equation}
+to be honest, python have many failure.in the next code\cite{a1,a2}
+\begin{lstlisting}[language=python]
+	class Solution:
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        sl=len(nums1)+len(nums2)
+        for i in range(sl):
+            if len
+            if(nums1[0]<nums2[0])
+\end{lstlisting}
+\subsection{Memory Optimization}
+
+balabala...
+
+\subsection{Algorithm Optimization}
+
+balabala...
+
+\section{a more useful Optimization}
+
+\subsection{conclusion}
+......
+
+\subsection{Result analysis}
+.......
+\newpage
+\begin{thebibliography}{3}
+	\bibitem{a1} High Performance Python by Micha Gorelick and Ian Ozsvald (O’Reilly). Copyright 2014 Micha Gorelick and Ian Ozsvald, 978-1-449-36159-4. 
+	\bibitem{a2} The NumPy Array: A Structure for Efficient Numerical Computation. Computing in Science and Engg. 13, 2 (March 2011), 22–30
+	\bibitem{a3} Bergstra, J., Breuleux, O., Bastien, F., Lamblin, P., Pascanu, R., Desjardins, G., Turian, J., Warde-Farley, D., Bengio, Y., 2010. Theano: a CPU and GPU math expression compiler. In: Proceedings of the Python for Scientific Computing Conference (SciPy), June 30–July 3, Austin, TX.
+\end{thebibliography}
+
+\end{document}
